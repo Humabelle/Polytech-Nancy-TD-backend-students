@@ -37,19 +37,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Task'
-# endpoint get
+        # endpoint get
         get:
             parameters:
                 - in: query
                   name: todo-only
-                  required: true
-                  description: indique s'il faut seulement récupérer les tâches à réaliser.
+                  required: false
+                  description: Indique s'il faut seulement récupérer les tâches à réaliser.
                   schema:
                       type: boolean
-
-
-            summary: Récupérer tâches
+            tags: [ tasks ]
+            summary: Récupérer toutes les tâches
             description: Récupérer toutes les tâches
+            operationId: getAllTasks
             responses:
                 '200':
                     description: tâches trouvées
@@ -57,8 +57,10 @@ paths:
                         application/json:
                             schema:
                                 type: array
+                                items:
+                                    $ref: "#/components/schemas/Task"
                 '204':
-                    description: tâches non trouvées
+                    description: []
 
 
 
@@ -86,21 +88,29 @@ paths:
                 '404':
                     description: Tâche non trouvée
 
-# endpoint delete a task
+        # endpoint delete a task
         delete:
-            summary: supprimer tâche
-            description: supprimer une tâche par son identifiant
-            operationId: getTaskById
+            tags: [ tasks ]
+            summary: Supprimer tâche
+            description: Supprimer une tâche par son identifiant
+            operationId: deleteTaskById
             responses:
                 '204':
                     description: tâche supprimée avec succès
                 '404':
                     description: tâche inexistante
-# endpoint edit a task
+        # endpoint edit a task
         put:
-            summary: modifier une tâche
-            description: modifier une tâche par son id
-            operationId: getTaskById
+            tags: [ tasks ]
+            summary: Modifier une tâche
+            description: Modifier une tâche par son id
+            operationId: putTaskById
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Task'
             responses:
                 '204':
                     description: tâche modifiée avec succès
