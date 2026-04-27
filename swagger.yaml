@@ -37,6 +37,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Task'
+# endpoint get
+        get:
+            parameters:
+                - in: query
+                  name: todo-only
+                  required: true
+                  description: indique s'il faut seulement récupérer les tâches à réaliser.
+                  schema:
+                      type: boolean
+
+
+            summary: Récupérer tâches
+            description: Récupérer toutes les tâches
+            responses:
+                '200':
+                    description: tâches trouvées
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                '204':
+                    description: tâches non trouvées
+
+
 
     /tasks/{id}:
         parameters:
@@ -61,6 +85,29 @@ paths:
                                 $ref: '#/components/schemas/Task'
                 '404':
                     description: Tâche non trouvée
+
+# endpoint delete a task
+        delete:
+            summary: supprimer tâche
+            description: supprimer une tâche par son identifiant
+            operationId: getTaskById
+            responses:
+                '204':
+                    description: tâche supprimée avec succès
+                '404':
+                    description: tâche inexistante
+# endpoint edit a task
+        put:
+            summary: modifier une tâche
+            description: modifier une tâche par son id
+            operationId: getTaskById
+            responses:
+                '204':
+                    description: tâche modifiée avec succès
+                '404':
+                    description: tâche non trouvée
+
+
 components:
     schemas:
         Task:
