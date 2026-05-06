@@ -60,7 +60,7 @@ paths:
                                 items:
                                     $ref: "#/components/schemas/Task"
                 '204':
-                    description: []
+                    description: no content
 
 
 
