@@ -19,14 +19,15 @@ paths:
             summary: Créer une tâche
             operationId: createTask
             requestBody:
+                description: createDto
                 required: true
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/Task'
+                            $ref: '#/components/schemas/CreateDto'
             responses:
                 '201':
-                    description: Tâche créée avec succès
+                    description: ReadDto
                     headers:
                         Location:
                             description: URL de la ressource créée
@@ -36,7 +37,15 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Task'
+                                $ref: '#/components/schemas/ReadDto'
+                '400':
+                    description: Paramètre invalide
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorDto'
+                '500':
+                    description: Erreur interne du serveur
         # endpoint get All Task
         get:
             parameters:
@@ -58,9 +67,11 @@ paths:
                             schema:
                                 type: array
                                 items:
-                                    $ref: "#/components/schemas/Task"
+                                    $ref: "#/components/schemas/ReadDto"
                 '204':
                     description: no content
+                '500':
+                    description: Erreur interne du serveur
 
 
 
@@ -84,9 +95,11 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/Task'
+                                $ref: '#/components/schemas/ReadDto'
                 '404':
                     description: Tâche non trouvée
+                '500':
+                    description: Erreur interne du serveur
 
         # endpoint delete a task
         delete:
@@ -99,6 +112,9 @@ paths:
                     description: tâche supprimée avec succès
                 '404':
                     description: tâche inexistante
+                '500':
+                    description: Erreur interne du serveur
+
         # endpoint edit a task
         put:
             tags: [ tasks ]
@@ -110,35 +126,92 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/Task'
+                            $ref: '#/components/schemas/UpdateDto'
             responses:
                 '204':
                     description: tâche modifiée avec succès
                 '404':
                     description: tâche non trouvée
+                '400':
+                    description: Paramètre invalide
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ErrorDto'
+                '500':
+                    description: Erreur interne du serveur
 
 
 components:
     schemas:
-        Task:
+        CreateDto:
             type: object
-            description: Représentation d'une tâche
+            description: Données pour créer une tâche
+            properties:
+                title:
+                    type: string
+                    maxLength: 50
+                    example: Acheter du lait
+                description:
+                    type: string
+                    maxLength: 255
+                    example: 2L demi-écrémé
+            required:
+                - title
+                - description
+
+        UpdateDto:
+            type: object
+            description: Données pour modifier une tâche
+            properties:
+                title:
+                    type: string
+                    maxLength: 50
+                    example: Acheter du lait
+                description:
+                    type: string
+                    maxLength: 255
+                    example: 2L demi-écrémé
+                done:
+                    type: boolean
+                    example: false
+            required:
+                - title
+                - description
+                - done
+
+        ReadDto:
+            type: object
+            description: Représentation d'une tâche retournée par l'API
             properties:
                 id:
                     type: integer
                     example: 1
                 title:
                     type: string
-                    nullable: true
                     example: Acheter du lait
                 description:
                     type: string
-                    nullable: true
                     example: 2L demi-écrémé
                 done:
                     type: boolean
-                    nullable: true
                     example: false
             required:
                 - id
                 - title
+                - description
+                - done
+
+        ErrorDto:
+            type: object
+            description: Représentation d'une erreur de validation
+            properties:
+                field:
+                    type: string
+                    example: title
+                message:
+                    type: string
+                    example: Le titre ne peut pas dépasser 50 caractères
+            required:
+                - field
+                - message

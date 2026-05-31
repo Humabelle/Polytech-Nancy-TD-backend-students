@@ -1,6 +1,9 @@
 package com.example.todoapp.presentation;
-import com.example.todoapp.business.model.Task;
-import com.example.todoapp.dao.TaskDao;
+import com.example.todoapp.business.exceptions.ValidationException;
+import com.example.todoapp.business.service.TaskService;
+import com.example.todoapp.presentation.dto.CreateDto;
+import com.example.todoapp.presentation.dto.ReadDto;
+import com.example.todoapp.presentation.dto.UpdateDto;
 import com.sun.net.httpserver.HttpExchange;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,7 +19,7 @@ import static java.util.Objects.nonNull;
 public class TaskController {
     
     private static final Pattern ID_PATH = Pattern.compile("^/tasks/([0-9]+)$");
-    private static final TaskDao dao = new TaskDao();
+    private static final TaskService service = new TaskService();
     
     public static void handleTasks(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
@@ -24,11 +27,13 @@ public class TaskController {
 
         //region Manage POST /tasks
         if ("POST".equals(method) && "/tasks".equals(path)) {
-            Task input = JsonUtils.deserialize(new String(exchange.getRequestBody().readAllBytes(), UTF_8), Task.class);
+            CreateDto input = JsonUtils.deserialize(new String(exchange.getRequestBody().readAllBytes(), UTF_8), CreateDto.class);
             try {
-                Optional<Task> createdTask = dao.save(input);
-                exchange.getResponseHeaders().add("Location", "/tasks/" + createdTask.get().id());
-                sendResponse(exchange, 201, JsonUtils.serialize(createdTask.get()));
+                ReadDto createdTask = service.create(input);
+                exchange.getResponseHeaders().add("Location", "/tasks/" + createdTask.id());
+                sendResponse(exchange, 201, JsonUtils.serialize(createdTask));
+            }catch (ValidationException e) {
+                sendResponse(exchange, 400, JsonUtils.serialize(e.getErrorDto()));
             } catch (SQLException e) {
                 sendResponse(exchange, 500, null);
             }
@@ -41,7 +46,7 @@ public class TaskController {
         if ("GET".equals(method) && m.matches()) {
             int id = Integer.parseInt(m.group(1));
             try {
-                Optional<Task> task = dao.getTaskById(id);
+                Optional<ReadDto> task = service.getById(id);
 
                 if (task.isPresent()) {
                     sendResponse(exchange, 200, JsonUtils.serialize(task.get()));
@@ -61,7 +66,7 @@ public class TaskController {
             String query = exchange.getRequestURI().getQuery();
             boolean todoOnly = (query != null) && query.contains("todo-only=true");
             try {
-                List<Task> taskList = dao.getAllTask(todoOnly);
+                List<ReadDto> taskList = service.getAll(todoOnly);
                 if (!taskList.isEmpty()) {
                     sendResponse(exchange, 200, JsonUtils.serialize(taskList));
                 } else {
@@ -78,15 +83,17 @@ public class TaskController {
         //region Manage PUT /tasks/{id}
         if ("PUT".equals(method) && m.matches()) {
             int id = Integer.parseInt(m.group(1));
-            Task updatedTask = JsonUtils.deserialize(new String(exchange.getRequestBody().readAllBytes(), UTF_8), Task.class);
+            UpdateDto updatedDto = JsonUtils.deserialize(new String(exchange.getRequestBody().readAllBytes(), UTF_8), UpdateDto.class);
             try {
-                Optional<Task> task = dao.editById(id, updatedTask);
+                Optional<ReadDto> task = service.update(id, updatedDto);
 
                 if (task.isPresent()) {
                     sendResponse(exchange, 204, null);
                 } else {
                     sendResponse(exchange, 404, null);
                 }
+            } catch (ValidationException e) {
+                sendResponse(exchange, 400, JsonUtils.serialize(e.getErrorDto()));
             } catch (SQLException e) {
                 sendResponse(exchange, 500, null);
             }
@@ -99,9 +106,8 @@ public class TaskController {
         if ("DELETE".equals(method) && m.matches()) {
             int id = Integer.parseInt(m.group(1));
             try {
-                Optional<Task> task = dao.deleteById(id);
-
-                if (task.isPresent()) {
+                boolean task = service.delete(id);
+                if (task) {
                     sendResponse(exchange, 204, null);
                 } else {
                     sendResponse(exchange, 404, null);

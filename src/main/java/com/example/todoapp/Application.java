@@ -15,7 +15,6 @@ public class Application {
 
         TaskDao dao = new TaskDao();
         dao.createTable();
-        dao.initializeTable();
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         server.createContext("/tasks", TaskController::handleTasks);
         server.setExecutor(null);
