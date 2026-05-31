@@ -1,4 +1,7 @@
 package com.example.todoapp.presentation.dto;
 
-public record  ErrorDto (String field, String message){
+/**
+ * DTO représentant une erreur de validation.
+ */
+public record ErrorDto(String field, String message) {
 }
