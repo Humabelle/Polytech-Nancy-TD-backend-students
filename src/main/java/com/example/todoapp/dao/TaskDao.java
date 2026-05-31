@@ -26,7 +26,7 @@ public class TaskDao {
         }
     }
 
-    private void initializeTable() throws SQLException {
+    public void initializeTable() throws SQLException {
         save(new Task(0, "Cuisiner", "Cuisiner atassi à 22h", false));
         save(new Task(0, "Discuter", "Répondre aux messages", false));
         save(new Task(0, "Réviser", "Réviser réseaux et analyse numérique", false));

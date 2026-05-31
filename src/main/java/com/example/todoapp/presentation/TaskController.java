@@ -1,12 +1,7 @@
 package com.example.todoapp.presentation;
-
-import com.example.todoapp.Application;
 import com.example.todoapp.business.model.Task;
 import com.example.todoapp.dao.TaskDao;
 import com.sun.net.httpserver.HttpExchange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.SQLException;
