@@ -80,6 +80,12 @@ public class TaskService {
         Optional<Task> task = dao.deleteById(id);
         return task.isPresent();
     }
+    /**
+     * supprimer les tâches
+     */
+    public void deleteAll() throws SQLException {
+        dao.deleteAll();
+    }
 
     /**
      * Valide le titre et la description d'une tâche.

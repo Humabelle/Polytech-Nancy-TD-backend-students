@@ -73,6 +73,17 @@ paths:
                 '500':
                     description: Erreur interne du serveur
 
+        delete:
+            tags: [ tasks ]
+            summary: Supprimer toutes les tâches
+            description: Supprimer toutes les tâches
+            operationId: deleteAllTasks
+            responses:
+                '204':
+                    description: toutes les tâches supprimées avec succès
+                '500':
+                    description: Erreur interne du serveur
+
 
 
     /tasks/{id}:

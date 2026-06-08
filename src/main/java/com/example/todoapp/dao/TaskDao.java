@@ -134,4 +134,16 @@ public class TaskDao {
             return getTaskById(id);
         }
     }
+
+    /**
+     * Delete {@link Task} model
+     */
+    public void deleteAll() throws SQLException {
+        try (Connection conn = DriverManager.getConnection(url)) {
+            String sql = "DELETE FROM mytasks";
+            conn.prepareStatement(sql).executeUpdate();
+        }
+    }
+
+
 }

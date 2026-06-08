@@ -121,6 +121,18 @@ public class TaskController {
         }
         //endregion
 
+        // region Manage DELETE /tasks/{id}
+        if ("DELETE".equals(method) && "/tasks".equals(path)) {
+            try {
+                service.deleteAll();
+                sendResponse(exchange, 204, null);
+            } catch (SQLException e) {
+                sendResponse(exchange, 500, null);
+            }
+            return;
+        }
+        //endregion
+
         //region Manage DELETE /tasks/{id}
         if ("DELETE".equals(method) && m.matches()) {
             int id = Integer.parseInt(m.group(1));
