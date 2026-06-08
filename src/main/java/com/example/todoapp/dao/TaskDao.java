@@ -123,11 +123,12 @@ public class TaskDao {
      */
     public Optional<Task> editById(int id, Task task) throws SQLException {
         try (Connection conn = DriverManager.getConnection(url)) {
-            String sql = "UPDATE mytasks SET title=?, description=? WHERE id=?";
+            String sql = "UPDATE mytasks SET title=?, description=?, done=? WHERE id=?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, task.title());
             pstmt.setString(2, task.description());
-            pstmt.setInt(3, id);
+            pstmt.setBoolean(3, task.done());
+            pstmt.setInt(4, id);
             pstmt.executeUpdate();
 
             return getTaskById(id);
