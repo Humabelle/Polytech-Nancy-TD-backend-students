@@ -40,6 +40,15 @@ public class TaskController {
         String method = exchange.getRequestMethod();
         String path = exchange.getRequestURI().getPath();
 
+        //manage options
+        if ("OPTIONS".equals(method)) {
+            exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+            exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
+            exchange.sendResponseHeaders(204, -1);
+            return;
+        }
+
         //region Manage POST /tasks
         if ("POST".equals(method) && "/tasks".equals(path)) {
             CreateDto input = JsonUtils.deserialize(new String(exchange.getRequestBody().readAllBytes(), UTF_8), CreateDto.class);
@@ -143,6 +152,10 @@ public class TaskController {
      * @throws IOException si une erreur survient lors de l'écriture de la réponse
      */
     private static void sendResponse(HttpExchange exchange, int status, String json) throws IOException {
+        exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+        exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+        exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
+
         if (nonNull(json)) {
             exchange.getResponseHeaders().set("Content-Type", "application/json; charset=utf-8");
             byte[] bytes = json.getBytes(UTF_8);
